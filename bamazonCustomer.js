@@ -1,5 +1,6 @@
-var inquirer = require('inquirer');
-var mysql = require('mysql');
+const inquirer = require('inquirer');
+const mysql = require('mysql');
+const { table } = require('table');
 
 // create the connection information for the sql database
 var connection = mysql.createConnection({
@@ -29,15 +30,34 @@ connection.connect(function (err) {
 
 function displayProducts() {
     connection.query('SELECT * FROM `products`', function (error, results, fields) {
-        console.log(`${fields[0].name} | ${fields[1].name} | ${fields[3].name}`);
+
+        //use table to display products to customer
+        let config,
+            data,
+            output;
+
+        //table array
+        data = [];
+
+        //column titles array to push into table array
+        var columnTitles = [fields[0].name,fields[1].name,fields[3].name];
+        data.push(columnTitles);
         results.forEach(function (row) {
-            console.log(`${row.item_id}       | ${row.product_name} | ${row.price}`);
+            //cells array to push into table array
+            var cells = [row.item_id,row.product_name,row.price];
+            data.push(cells);
         })
+
+        //display the table
+        output = table(data, config);
+        console.log(output);
+
+        //run function to ask questions with inquirer
         ask();
     });
 }
 
-
+//gets user input with inquirer
 function ask() {
     inquirer.prompt([
         {
@@ -49,17 +69,17 @@ function ask() {
                 var done = this.async();
                 input = parseInt(input);
                 // Do async stuff
-                setTimeout(function() {
-                  if (isNaN(input)) {
+                setTimeout(function () {
+                    if (isNaN(input)) {
+                        // Pass the return value in the done callback
+                        done('You need to provide a number. Try again.');
+                        return;
+                    }
                     // Pass the return value in the done callback
-                    done('You need to provide a number. Try again.');
-                    return;
-                  }
-                  // Pass the return value in the done callback
-                  done(null, true);
-                },500);
-              }
-              
+                    done(null, true);
+                }, 500);
+            }
+
         },
         {
             type: "input",
@@ -70,16 +90,16 @@ function ask() {
                 var done = this.async();
                 input = parseInt(input);
                 // Do async stuff
-                setTimeout(function() {
-                  if (isNaN(input)) {
+                setTimeout(function () {
+                    if (isNaN(input)) {
+                        // Pass the return value in the done callback
+                        done('You need to provide a number. Try again.');
+                        return;
+                    }
                     // Pass the return value in the done callback
-                    done('You need to provide a number. Try again.');
-                    return;
-                  }
-                  // Pass the return value in the done callback
-                  done(null, true);
-                },500);
-              }
+                    done(null, true);
+                }, 500);
+            }
         }
     ]).then(function (answers) {
         customerProduct = answers.id;
@@ -88,34 +108,37 @@ function ask() {
     });
 }
 
+//checks if there is sufficient product in stock
 function checkProduct() {
-    connection.query('SELECT * FROM `products` WHERE `item_id`=?',[customerProduct], function (error, results, fields) {
+    connection.query('SELECT * FROM `products` WHERE `item_id`=?', [customerProduct], function (error, results, fields) {
         var stockQuantity = results[0].stock_quantity;
         customerPrice = results[0].price;
-        if (stockQuantity < customerQuantity ) {
+        //if not enough product in stock
+        if (stockQuantity < customerQuantity) {
             console.log('Insufficient quantity!');
             connection.end();
         }
+        //if enough product in stock, place the order
         else {
             connection.query(
                 "UPDATE products SET ? WHERE ?",
                 [
-                  {
-                    stock_quantity: stockQuantity - customerQuantity
-                  },
-                  {
-                    item_id: customerProduct
-                  }
+                    {
+                        //decrease stock by order quantity
+                        stock_quantity: stockQuantity - customerQuantity
+                    },
+                    {
+                        item_id: customerProduct
+                    }
                 ],
-                function(error) {
-                  if (error) throw error;
-                  customerCost = customerQuantity * customerPrice;
-                  console.log(`Order placed successfully. Your total cost is: ${customerCost}`);
-                  connection.end();
+                function (error) {
+                    if (error) throw error;
+                    customerCost = customerQuantity * customerPrice;
+                    console.log(`Order placed successfully. Your total cost is: ${customerCost}`);
+                    connection.end();
                 }
-              );
+            );
         }
     });
-    
 }
 
