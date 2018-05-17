@@ -79,7 +79,6 @@ function ask() {
                     done(null, true);
                 }, 500);
             }
-
         },
         {
             type: "input",
@@ -141,4 +140,3 @@ function checkProduct() {
         }
     });
 }
-
