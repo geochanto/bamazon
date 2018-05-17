@@ -18,6 +18,8 @@ var connection = mysql.createConnection({
 
 var customerProduct;
 var customerQuantity;
+var customerPrice;
+var customerCost;
 
 // connect to the mysql server and sql database
 connection.connect(function (err) {
@@ -27,24 +29,57 @@ connection.connect(function (err) {
 
 function displayProducts() {
     connection.query('SELECT * FROM `products`', function (error, results, fields) {
+        console.log(`${fields[0].name} | ${fields[1].name} | ${fields[3].name}`);
         results.forEach(function (row) {
-            console.log(row.item_id + " | " + row.product_name + " | " + row.price);
+            console.log(`${row.item_id}       | ${row.product_name} | ${row.price}`);
         })
         ask();
     });
 }
+
 
 function ask() {
     inquirer.prompt([
         {
             type: "input",
             name: "id",
-            message: "Enter the ID of the product you would like to buy."
+            message: "Enter the ID of the product you would like to buy.",
+            validate: function (input) {
+                // Declare function as asynchronous, and save the done callback
+                var done = this.async();
+                input = parseInt(input);
+                // Do async stuff
+                setTimeout(function() {
+                  if (isNaN(input)) {
+                    // Pass the return value in the done callback
+                    done('You need to provide a number. Try again.');
+                    return;
+                  }
+                  // Pass the return value in the done callback
+                  done(null, true);
+                },500);
+              }
+              
         },
         {
             type: "input",
             name: "quantity",
-            message: "Enter the quantity you would like to buy."
+            message: "Enter the quantity you would like to buy.",
+            validate: function (input) {
+                // Declare function as asynchronous, and save the done callback
+                var done = this.async();
+                input = parseInt(input);
+                // Do async stuff
+                setTimeout(function() {
+                  if (isNaN(input)) {
+                    // Pass the return value in the done callback
+                    done('You need to provide a number. Try again.');
+                    return;
+                  }
+                  // Pass the return value in the done callback
+                  done(null, true);
+                },500);
+              }
         }
     ]).then(function (answers) {
         customerProduct = answers.id;
@@ -56,6 +91,7 @@ function ask() {
 function checkProduct() {
     connection.query('SELECT * FROM `products` WHERE `item_id`=?',[customerProduct], function (error, results, fields) {
         var stockQuantity = results[0].stock_quantity;
+        customerPrice = results[0].price;
         if (stockQuantity < customerQuantity ) {
             console.log('Insufficient quantity!');
             connection.end();
@@ -73,7 +109,8 @@ function checkProduct() {
                 ],
                 function(error) {
                   if (error) throw error;
-                  console.log("Order placed successfully!");
+                  customerCost = customerQuantity * customerPrice;
+                  console.log(`Order placed successfully. Your total cost is: ${customerCost}`);
                   connection.end();
                 }
               );
