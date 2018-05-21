@@ -102,7 +102,7 @@ function ask() {
         }
     ]).then(function (answers) {
         customerProduct = answers.id;
-        customerQuantity = answers.quantity;
+        customerQuantity = parseInt(answers.quantity);
         checkProduct();
     });
 }
