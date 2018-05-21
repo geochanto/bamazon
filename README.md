@@ -21,16 +21,16 @@ Products are saved in an SQL database called 'products'. Check `schema.sql` for 
 2. Customer enters the id of the product they want to purchase
 3. Customer enters the number of items they want to buy
 4. If there are no sufficient items, error is printed. Otherwise order is fullfilled, SQL database updated and Customer is prompted with their total purchase value.
+Screencap: http://www.screencast.com/t/4tOVpDD1FV7
 
 ### Manager view allows a manager to manage or update the database by running `node bamazonManager.js` 
 Once run, manager is presented with 4 choices:
 1. If a manager selects `View Products for Sale`, the app lists every available item: the item IDs, names, prices, and quantities.
-
 2. If a manager selects `View Low Inventory`, then it lists all items with an inventory count lower than five.
-
 3. If a manager selects `Add to Inventory`, app displays a prompt that will let the manager "add more" of any item currently in the store.
-
 4. If a manager selects `Add New Product`, it allows the manager to add a completely new product to the store.
+
+Screencap: http://www.screencast.com/t/yAt1g5uBKIoR
 
 ## Why this project?
 This app helps beginners with understanding and working with MySQL using Node.
@@ -41,6 +41,8 @@ To get started with this project, do one of the following:
 1. Using git from command line, `git clone git@github.com:geochanto/bamazon.git` 
 2. Download the zip archive: https://github.com/geochanto/bamazon/archive/master.zip
 3. Create a fork at https://github.com/geochanto/bamazon
+
+Note that you will need set up and connect to MySQL for this app to work.
 
 ## Improve Bamazon
 Add your own spin to this app:
