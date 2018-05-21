@@ -114,8 +114,8 @@ function checkProduct() {
         customerPrice = results[0].price;
         //if not enough product in stock
         if (stockQuantity < customerQuantity) {
-            console.log('Insufficient quantity!');
             connection.end();
+            return console.log('Insufficient quantity!');
         }
         //if enough product in stock, place the order
         else {
